@@ -1,0 +1,25 @@
+---
+- name: capture PM
+  hosts: all
+  gather_facts: no
+  connection: network_cli
+
+  tasks:
+    - name: grab data for PM
+      ios_command:
+        commands:
+          - sh memory summary | exc 0x
+          - dir
+          - show processes cpu | inc CPU utilization
+          - show ip int br
+          - show int status
+          - show int count errors
+          - show version
+          - show invent
+          - show run
+      register: config
+
+    - name: save output to local directory
+      copy:
+        content: "{{ config.stdout | replace('\\n','\n') }}"      
+        dest: "/home/user/ansible/pm_log/ldci/ {{ inventory_hostname }}.txt"
