@@ -1,0 +1,19 @@
+---
+- name: backup running config
+  hosts: routers
+  gather_facts: false
+  connection: network_cli
+
+
+  tasks:
+  - name: backup running config
+    ios_command:
+      commands:
+        - "show memory sum"
+        - "show inventory"
+    register: output
+
+  - name: save running config
+    copy:
+      content: "{{ output.stdout[0] }}"
+      dest: "/home/user/ansible/pm_log/ldci/ {{ inventory_hostname }}.cfg"
